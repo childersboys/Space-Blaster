@@ -223,7 +223,6 @@ class Game (Scene):
 			actions = [A.move_to(random.uniform(0, self.size.w), -100, d), A.remove()]
 			power.run_action(A.sequence(actions))
 			self.items.append(power)
-			# print(power)
 			
 	def spawn_star(self):
 		coin = Coin(parent=self)
