@@ -18,6 +18,7 @@ A = Action
 
 paused = False
 
+game = 1
 
 def cmp(a, b):
 	return ((a > b) - (a < b))
@@ -60,6 +61,7 @@ class Game (Scene):
 		self.power_label = LabelNode('0', power_font, parent=self)
 		self.power_label.position = (200, 20)
 		self.power_label.z_position = 1
+		game = 0
 		
 	def end_game(self):
 		self.shield = 0
@@ -92,8 +94,8 @@ class Game (Scene):
 	
 	def update_player(self):
 		g = gravity()
-#		if self.powerups[1] > 200:
-#			self.powerups[1] = 200
+	# if self.powerups[1] > 200:
+	#		self.powerups[1] = 200
 		if abs(g.x) > 0.05:
 			self.player.x_scale = cmp(g.x, 0)
 			x = self.player.position.x
@@ -151,6 +153,11 @@ class Game (Scene):
 		self.game_over = False
 		self.powerups = [50, 0]
 		sound.play_effect('arcade:Powerup_2', 0.2)
+		global game
+		if game == 0:
+			game = 1
+		else:
+			game = 0
 	
 	def check_laser_collisions(self):
 		for laser in list(self.lasers):
@@ -233,7 +240,8 @@ class Game (Scene):
 		self.items.append(coin)
 			
 	def spawn_item(self):
-		self.spawn_star()
+		for i in range(1, 2):
+			self.spawn_star()
 		if random.random() < 0.1 * self.speed:
 			self.spawn_meteor()
 		elif random.random() > 0.2 * self.speed:
@@ -262,31 +270,49 @@ class Game (Scene):
 		
 	def show_start_menu(self):
 		self.paused = True
-		self.menu = MenuScene('Space Blaster', 'Score to beat: %i' % self.highscore, ['Play'])
+		self.menu = MenuScene('Space Blaster', 'Score to beat: %i' % self.highscore, ['Play', 'Instructions'])
+		self.present_modal_scene(self.menu)
+		
+	def instruct_menu(self):
+		if game == 0:
+			bob = 'Launch!'
+		elif game == 1: 
+			bob = 'Continue'
+		self.paused = True
+		self.menu = MenuScene('Instructions', 'Tilt to Move\nTap to Shoot', [bob])
 		self.present_modal_scene(self.menu)
 		
 	def menu_button_selected(self, title):
-		if title in ('Continue', 'New Game', 'Play', 'Try Again'):
+		#randsound = random.choice(['digital:Laser1', 'digital:Laser2', 'digital:Laser3', 'digital:Laser4', 'digital:Laser5', 'digital:Laser6', 'digital:Laser7', 'digital:Laser8', 'digital:Laser9', 'arcade:Laser_1', 'arcade:Laser_2', 'arcade:Laser_3', 'arcade:Laser_4', 'arcade:Laser_5', 'arcade:Laser_6'])
+		if title in ('Continue', 'New Game', 'Play', 'Try Again', 'Launch!'):
+			game = 1
 			self.dismiss_modal_scene()
 			self.menu = None
 			self.paused = False
-			if title in ('New Game', 'Play', 'Try Again'):
+			if title in ('New Game', 'Play', 'Try Again', 'Launch!'):
 				self.new_game()
-		elif title in ('Press Me!'):
-			sound.play_effect('rpg:KnifeSlice2')
+				game = 1
+		elif title in ('Help', 'Instructions'):
+			self.dismiss_modal_scene()
+			self.menu = None
+			self.paused = False
+			self.instruct_menu()
+		#elif title in ('Press Me!'):
+		#	sound.play_effect(randsound)
 		else:
 			print(title)
 			
 	def shoot_laser(self):
+		randlaser = random.choice(['spc:LaserRed10', 'spc:LaserGreen10', 'spc:LaserBlue10'])
 		if len(self.lasers) >= 8:
 			return
 		if self.powerups[0] > 0:
 			self.powerups[0] -= 1
 		else:
 			return
-		laser = SpriteNode('spc:Fire4', parent=self)
-		laser.x_scale = 2.5
-		laser.y_scale = 2.5
+		laser = SpriteNode(randlaser, parent=self)
+		laser.x_scale = 1
+		laser.y_scale = 1
 		laser.position = self.player.position + (0, 30)
 		laser.z_position = -1
 		actions = [A.move_by(0, self.size.h, 1.2 * self.speed), A.remove()]
@@ -316,8 +342,8 @@ class Game (Scene):
 		
 	def pause_menu(self):
 		self.paused = True
-		self.menu = MenuScene('Game Paused', 'Beat this score: %i' % self.highscore, ['Continue', 'New Game', 'Press Me!'])
+		self.menu = MenuScene('Game Paused', 'Beat this score: %i' % self.highscore, ['Continue', 'New Game', 'Help'])
 		self.present_modal_scene(self.menu)
 
 if __name__ == '__main__':
-	run(Game(), PORTRAIT, show_fps=False, multi_touch=False)
+	run(Game(), PORTRAIT, show_fps=True, multi_touch=False)
