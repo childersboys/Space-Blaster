@@ -18,7 +18,6 @@ A = Action
 
 paused = False
 
-game = 1
 
 def cmp(a, b):
 	return ((a > b) - (a < b))
@@ -61,7 +60,6 @@ class Game (Scene):
 		self.power_label = LabelNode('0', power_font, parent=self)
 		self.power_label.position = (200, 20)
 		self.power_label.z_position = 1
-		game = 0
 		
 	def end_game(self):
 		self.shield = 0
@@ -153,11 +151,6 @@ class Game (Scene):
 		self.game_over = False
 		self.powerups = [50, 0]
 		sound.play_effect('arcade:Powerup_2', 0.2)
-		global game
-		if game == 0:
-			game = 1
-		else:
-			game = 0
 	
 	def check_laser_collisions(self):
 		for laser in list(self.lasers):
@@ -181,7 +174,7 @@ class Game (Scene):
 		meteor.destroyed = True
 		meteor.texture = Texture('shp:nova')
 		for i in range(5):
-			m = SpriteNode('spc:LaserRed10', parent=self)
+			m = SpriteNode('spc:LaserBlue10', parent=self)
 			m.position = meteor.position + (random.uniform(-20, 20), random.uniform(-20, 20))
 			angle = random.uniform(0, pi*2)
 			dx, dy = cos(angle) * 80, sin(angle) * 80
@@ -263,42 +256,34 @@ class Game (Scene):
 		self.items.remove(item)
 		self.score += value
 		self.score_label.text = str(self.score)
-		global hitcount
-		if hitcount > 0:
-			pass
-			# hitcount = hitcount - 1
 		
 	def show_start_menu(self):
 		self.paused = True
-		self.menu = MenuScene('Space Blaster', 'Score to beat: %i' % self.highscore, ['Play', 'Instructions'])
+		self.menu = MenuScene('Space Blaster', 'Score to beat: %i' % self.highscore, ['Launch!', 'Instructions'])
 		self.present_modal_scene(self.menu)
 		
-	def instruct_menu(self):
-		if game == 0:
-			bob = 'Launch!'
-		elif game == 1: 
-			bob = 'Continue'
+	def instruct_menu(self, bob = 'Continue'):
 		self.paused = True
 		self.menu = MenuScene('Instructions', 'Tilt to Move\nTap to Shoot', [bob])
 		self.present_modal_scene(self.menu)
 		
 	def menu_button_selected(self, title):
-		#randsound = random.choice(['digital:Laser1', 'digital:Laser2', 'digital:Laser3', 'digital:Laser4', 'digital:Laser5', 'digital:Laser6', 'digital:Laser7', 'digital:Laser8', 'digital:Laser9', 'arcade:Laser_1', 'arcade:Laser_2', 'arcade:Laser_3', 'arcade:Laser_4', 'arcade:Laser_5', 'arcade:Laser_6'])
 		if title in ('Continue', 'New Game', 'Play', 'Try Again', 'Launch!'):
-			game = 1
 			self.dismiss_modal_scene()
 			self.menu = None
 			self.paused = False
-			if title in ('New Game', 'Play', 'Try Again', 'Launch!'):
+			if title in ('Play', 'Try Again','Launch!'):
 				self.new_game()
-				game = 1
+			elif title in ('New Game'):
+				self.show_start_menu()
 		elif title in ('Help', 'Instructions'):
 			self.dismiss_modal_scene()
 			self.menu = None
 			self.paused = False
-			self.instruct_menu()
-		#elif title in ('Press Me!'):
-		#	sound.play_effect(randsound)
+			if title == 'Help':
+				self.instruct_menu()
+			else:
+				self.instruct_menu(bob = 'Launch!')
 		else:
 			print(title)
 			
@@ -346,4 +331,4 @@ class Game (Scene):
 		self.present_modal_scene(self.menu)
 
 if __name__ == '__main__':
-	run(Game(), PORTRAIT, show_fps=True, multi_touch=False)
+	run(Game(), PORTRAIT, show_fps=True, multi_touch=False, anti_alias=False)
