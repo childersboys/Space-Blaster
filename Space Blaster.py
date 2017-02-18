@@ -4,27 +4,27 @@ Created from various games in Pythonista 3, along with help from my dad.
 
 Copyright (c) 2017, Glen David Childers
 '''
-
 from scene import *
 from Coin import *
 from Shield import *
 from Meteor import *
 
+import speech
 import sound
 import random
 from math import sin, cos, pi
 from game_menu import MenuScene
 A = Action
 
-paused = False
+paused = True
 
 
 def cmp(a, b):
 	return ((a > b) - (a < b))
 
-standing_texture = Texture('1.jpg')
-walk_textures = [Texture('r.jpg'), Texture('r.jpg')]
-hit_texture = Texture('shp:Explosion06')
+standing_texture = Texture('IMG_0499_3.GIF')
+walk_textures = [Texture('IMG_0499_2.GIF'), Texture('IMG_0499_2.GIF')]
+hit_texture = Texture('shp:Gradient-2')
 hitcount = 0
 
 		
@@ -62,13 +62,12 @@ class Game (Scene):
 		self.power_label.z_position = 1
 		
 	def end_game(self):
-		self.shield = 0
-		self.shield_label.text = '0'
+		speech.say('You have died. Try harder next time.')
 		if self.score > self.highscore:
 			with open('SpaceBlaster.highscore', 'w') as f:
 				f.write(str(self.score))
 			self.highscore = self.score
-		sound.play_effect('digital:ZapThreeToneDown')
+			sound.play_effect('digital:ZapThreeToneDown')
 		self.show_game_over_menu()
 
 	def update(self):
@@ -170,15 +169,16 @@ class Game (Scene):
 					break
 	
 	def destroy_meteor(self, meteor):
+		randlaser = random.choice(['spc:MeteorGraySmall2', 'spc:MeteorGrayTiny1', 'spc:MeteorGrayTiny2'])
 		sound.play_effect('arcade:Explosion_5', 1)
 		meteor.destroyed = True
-		meteor.texture = Texture('shp:nova')
-		for i in range(5):
-			m = SpriteNode('spc:LaserBlue10', parent=self)
-			m.position = meteor.position + (random.uniform(-20, 20), random.uniform(-20, 20))
+		meteor.texture = Texture('plc:Star')
+		for i in range(10):
+			m = SpriteNode(randlaser, parent=self)
+			m.position = meteor.position + (random.uniform(-1, 25), random.uniform(-25, 1))
 			angle = random.uniform(0, pi*2)
-			dx, dy = cos(angle) * 80, sin(angle) * 80
-			m.run_action(A.move_by(dx, dy, 0.6, TIMING_EASE_OUT))
+			dx, dy = cos(angle) * 1, sin(angle) * 1
+			m.run_action(A.move_by(dx, dy, 0.6, TIMING_ELASTIC_OUT))
 			m.run_action(A.sequence(A.scale_to(0, 0.6), A.remove()))
 	
 	def player_hit(self, item):
@@ -263,6 +263,7 @@ class Game (Scene):
 		self.present_modal_scene(self.menu)
 		
 	def instruct_menu(self, bob = 'Continue'):
+		speech.say('Tilt to Move your Ship, and Tap to Use Weapons')
 		self.paused = True
 		self.menu = MenuScene('Instructions', 'Tilt to Move\nTap to Shoot', [bob])
 		self.present_modal_scene(self.menu)
@@ -275,6 +276,9 @@ class Game (Scene):
 			if title in ('Play', 'Try Again','Launch!'):
 				self.new_game()
 			elif title in ('New Game'):
+				self.dismiss_modal_scene()
+				self.menu = None
+				self.paused = False
 				self.show_start_menu()
 		elif title in ('Help', 'Instructions'):
 			self.dismiss_modal_scene()
@@ -284,20 +288,27 @@ class Game (Scene):
 				self.instruct_menu()
 			else:
 				self.instruct_menu(bob = 'Launch!')
+		elif title in ('Save Score'):
+			if self.score > self.highscore:
+				with open('SpaceBlaster.highscore', 'w') as f:
+					f.write(str(self.score))
+					self.highscore = self.score
 		else:
 			print(title)
 			
 	def shoot_laser(self):
-		randlaser = random.choice(['spc:LaserRed10', 'spc:LaserGreen10', 'spc:LaserBlue10'])
+		rand1 = random.choice(['spc:LaserGreen10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserGreen12', 'spc:LaserGreen10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue9', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue9', 'spc:LaserGreen11', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue12', 'spc:LaserBlue10', 'spc:LaserBlue11', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserGreen10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue11', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue9', 'spc:LaserBlue10', 'spc:LaserGreen10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserBlue10', 'spc:LaserGreen10', 'spc:LaserBlue10', 'spc:LaserBlue12', 'spc:LaserBlue9'])
+		rand2 = random.choice(['IMG_0499_1.GIF', 'IMG_0499.GIF'])
+		randlaser = random.choice([rand1, rand1, rand1, rand1, rand1, rand1, rand1, rand1, rand1, rand1, rand1, rand2])
 		if len(self.lasers) >= 8:
 			return
 		if self.powerups[0] > 0:
 			self.powerups[0] -= 1
 		else:
 			return
-		laser = SpriteNode(randlaser, parent=self)
-		laser.x_scale = 1
-		laser.y_scale = 1
+		laser = SpriteNode(rand2, parent=self)
+		laser.x_scale = 3
+		laser.y_scale = 3
 		laser.position = self.player.position + (0, 30)
 		laser.z_position = -1
 		actions = [A.move_by(0, self.size.h, 1.2 * self.speed), A.remove()]
@@ -327,7 +338,7 @@ class Game (Scene):
 		
 	def pause_menu(self):
 		self.paused = True
-		self.menu = MenuScene('Game Paused', 'Beat this score: %i' % self.highscore, ['Continue', 'New Game', 'Help'])
+		self.menu = MenuScene('Game Paused', 'Beat this score: %i' % self.highscore, ['Continue', 'New Game', 'Help', 'Save Score'])
 		self.present_modal_scene(self.menu)
 
 if __name__ == '__main__':
