@@ -8,6 +8,7 @@ from scene import *
 from Coin import *
 from Shield import *
 from Meteor import *
+import notification
 
 import speech
 import sound
@@ -51,8 +52,8 @@ class Game (Scene):
 		self.shield_label.z_position = 1
 		self.items = []
 		self.lasers = []
-		self.run_action(A.sequence(A.wait(0.0), A.call(self.show_start_menu)))
 		self.new_game()
+		self.run_action(A.sequence(A.wait(0.0), A.call(self.show_start_menu)))
 		self.highscore = self.load_highscore()
 		self.pause_button = SpriteNode('iow:pause_32', position=(32, self.size.h-36), parent=self)
 		self.powerups = [50, 0]
@@ -62,12 +63,15 @@ class Game (Scene):
 		self.power_label.z_position = 1
 		
 	def end_game(self):
-		speech.say('You have died. Try harder next time.')
+		speech.say('You have died. Try Harder Next Time', 'id_ID')
 		if self.score > self.highscore:
 			with open('SpaceBlaster.highscore', 'w') as f:
 				f.write(str(self.score))
 			self.highscore = self.score
-			sound.play_effect('digital:ZapThreeToneDown')
+		for item in list(self.lasers):
+			item.remove_from_parent()
+		self.lasers = []
+#sound.play_effect('digital:ZapThreeToneDown')
 		self.show_game_over_menu()
 
 	def update(self):
@@ -76,13 +80,15 @@ class Game (Scene):
 			return
 		self.shield_label.text = 'Shields: ' + str(100 + self.powerups[1] - hitcount) + '%'
 		self.power_label.text = 'Ammo: ' + str(self.powerups[0])
-		self.update_player()
+		self.update_player()		
 		self.check_item_collisions()
 		self.check_laser_collisions()
 		if random.random() < 0.05 * self.speed:
 			self.spawn_item()
 		
 	def touch_began(self, touch):
+		if self.game_over:
+			return
 		if touch.location.x < 48 and touch.location.y > self.size.h - 48:
 			self.pause_menu()
 		else:
@@ -175,7 +181,7 @@ class Game (Scene):
 		meteor.texture = Texture('plc:Star')
 		for i in range(10):
 			m = SpriteNode(randlaser, parent=self)
-			m.position = meteor.position + (random.uniform(-1, 25), random.uniform(-25, 1))
+			m.position = meteor.position + (random.uniform(-10, 10), random.uniform(10, -10))
 			angle = random.uniform(0, pi*2)
 			dx, dy = cos(angle) * 1, sin(angle) * 1
 			m.run_action(A.move_by(dx, dy, 0.6, TIMING_ELASTIC_OUT))
@@ -275,6 +281,7 @@ class Game (Scene):
 			self.paused = False
 			if title in ('Play', 'Try Again','Launch!'):
 				self.new_game()
+				speech.say('Attack their ships, ...and try to survive', 'id_ID')
 			elif title in ('New Game'):
 				self.dismiss_modal_scene()
 				self.menu = None
@@ -342,4 +349,4 @@ class Game (Scene):
 		self.present_modal_scene(self.menu)
 
 if __name__ == '__main__':
-	run(Game(), PORTRAIT, show_fps=True, multi_touch=False, anti_alias=False)
+	run(Game(), PORTRAIT, show_fps=False, multi_touch=False, anti_alias=False)
