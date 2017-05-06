@@ -1,118 +1,133 @@
 import console
-import random
+from random import randint
 
 # Attributes
-Hunger = -1
-Thirst = -1
-Fatigue = -1
-Enjoyment = 101
+Hunger = 0
+Thirst = 0
+Fatigue = 0
+Enjoyment = 0
+Age = 0
+flag = False
+
 # Randomized things
-BodyDecor = ['horned', 'spiked', 'shiny', 'glowing']
-detail = BodyDecor[random.randint(0, 3)]
-Body = ['small', 'large', 'giant']
-bodysize = Body[random.randint(0, 2)]
-ColorsScale = ['red', 'green', 'blue',
-          'purple', 'yellow', 'orange']
-scalecolor = ColorsScale[random.randint(0,5)]
-ColorsEye = ['red', 'green', 'blue',
-          'purple', 'yellow', 'orange']
-eyecolor = ColorsEye[random.randint(0,5)]
+AnimalTypes = ['eeklor', 'trillinsi', 'plokwei', 'intricose', 'charaldim', 'klonesalp', 'blixerit']
+BodyDecor = ['horned', 'spiked', 'shiny', 'glowing', 'icy', 'shadowed', 'time traveling']
+detail = BodyDecor[randint(0, 6)]
+Body = ['small', 'large', 'giant', 'staggeringly large']
+bodysize = Body[randint(0, 3)]
+Colors = ['red', 'green', 'blue',
+          'purple', 'yellow', 'orange', 'octarine']
+scalecolor = Colors[randint(0,6)]
+eyecolor = Colors[randint(0,3)]
 Sizes = ['tiny', 'small', 'medium',
          'large', 'giant']
-scalesize = Sizes[random.randint(0,4)]
+scalesize = Sizes[randint(0,4)]
+
+
+Animal = dict()
+Animal['species'] = AnimalTypes[randint(0, 6)]
+Animal['hunger'] = 0
+Animal['thirst'] = 0
+Animal['fatigue'] = 0
+Animal['age'] = 0
+Animal['happiness'] = 0
+Animal['maxage'] = randint(80, 110)
+#print(Animal)
+#input()
 
 # functions 
 def Increment():
-	global Hunger, Thirst, Fatigue
-	global Enjoyment
-	Hunger = Hunger + 1
-	Thirst = Thirst + 1
-	Fatigue = Fatigue + 1
-	Enjoyment = Enjoyment - 1
+	global Animal
+	Animal['hunger'] += 1
+	Animal['thirst'] += 1
+	Animal['fatigue'] += 1
+	Animal['happiness'] += 1
+	Animal['age'] += 1
+	#print(Animal)
 
 def Hungerlevels():
-	global Hunger, Thirst, Fatigue
-	global Enjoyment, flag
-	if Hunger == 0 or 49:
+	global Animal
+	global flag
+	if 0 <= Animal['hunger'] <= 49:
 		print('I am not hungry.')
-	elif Hunger == 50 or 89:
+	elif 50 <= Animal['hunger'] <= 89:
 		print('I am hungry.')
-	elif Hunger == 90:
+	elif 90 <= Animal['hunger'] <= 99:
 		print('I am starving! Feed me!')
-	elif Hunger == 100:
-		print(Name, 'Died. ')
+	elif Animal['hunger'] == 100:
+		print(Name, 'Starved. ')
 		flag = False
+		
 def Thirstlevels():
-	global Hunger, Thirst, Fatigue
-	global Enjoyment, flag
-	if Thirst == 0 or 49:
+	global Animal
+	global flag
+	if 0 <= Animal['thirst'] <= 49:
 		print('I am not thirsty.')
-	elif Hunger == 50 or 89:
+	elif 50 <= Animal['thirst'] <= 89:
 		print('I am thirsty.')
-	elif Hunger == 90:
+	elif 90 <= Animal['thirst'] <= 99:
 		print('I am drying up! Give me water!')
-	elif Hunger == 100:
+	elif Animal['thirst'] == 0:
 		print(Name, 'Died. ')
 		flag = False
 
 def Fatiguelevels():
-	global Hunger, Thirst, Fatigue
-	global Enjoyment, flag
-	if Hunger == 0 or 49:
+	global Animal
+	global flag
+	if 0 <= Animal['fatigue'] <= 49:
 		print('I am not tired.')
-	elif Hunger == 50 or 89:
+	elif 50 <= Animal['fatigue'] <= 89:
 		print('I am tired.')
-	elif Hunger == 90:
+	elif 90 <= Animal['fatigue'] <= 99:
 		print('I am about to collapse! Let me sleep!')
-	elif Hunger == 100:
+	elif Animal['fatigue'] == 100:
 		print(Name, 'Died. ')
 		flag = False
 
 def Enjoymentlevels():
-	global Hunger, Thirst, Fatigue
-	global Enjoyment, flag
-	if Hunger == 0 or 49:
+	global Animal
+	global flag
+	if 0 <= Animal['happiness'] <= 49:
 		print('I am having fun!')
-	elif Hunger == 50 or 89:
+	elif 50 <= Animal['happiness'] <= 89:
 		print('I am bored.')
-	elif Hunger == 90:
+	elif 90 <= Animal['happiness'] <= 99:
 		print('I will run away soon! Give me something to do!')
-	elif Hunger == 100:
+	elif Animal['happiness'] == 100:
 		print(Name, 'Ran Away. ')
 		flag = False
+		
 def food():
-	global Hunger
+	global Animal
 	print('He ate the food. ')
-	Hunger = Hunger - 1
+	Animal['hunger'] -= 2
 	
 def water():
-	global Thirst
+	global Animal
 	print('He drank the water. ')
-	Thirst = Thirst - 1
+	Animal['thirst'] -= 2
 	
 def tiredness():
-	global Fatigue
+	global Animal
 	print('He took a nap. ')
-	Fatigue = Fatigue - 1
+	Animal['fatigue'] -= 2
 	
 def Play():
-	global Enjoyment
+	global Animal
 	print('He is happy to play. ')
-	Enjoyment = Enjoyment + 1
+	Animal['happiness'] -= 2
 
 def prepare():
   global Name
-  console.set_font('Academy Engraved LET', 36)
+  console.set_font('Academy Engraved LET', 16)
   console.set_color(.23, 1.0, .45)
   Name = input('Name your pet! ')
   console.set_color(.0, .86, 1.2)
-  console.set_font('Academy Engraved LET', 36)
+  console.set_font('Academy Engraved LET', 16)
 
 # run it
 prepare()
-print(Name, 'is a', bodysize, detail, 'creature. It is covered in', scalesize, scalecolor, 'scales, with', eyecolor, 'eyes.')
-console.set_color(1.0, .0, .0)
-print('You may use the following commands: Play, Let Rest, Offer Food, Offer Water, Quit')
+console.clear()
 console.set_color(.23, 1.0, .45)
 
 def Status():
@@ -120,27 +135,70 @@ def Status():
 	Thirstlevels()
 	Fatiguelevels()
 	Enjoymentlevels()
+
+def offerwater():
+	console.clear()
+	water()
+
+def playwith():
+	console.clear()
+	Play()
 	
+def offerfood():
+	console.clear()
+	food()
+	
+def letrest():
+	console.clear()
+	tiredness()
+	
+def quit():
+	global flag
+	console.clear()
+	flag = False
+
+def xyzzy():
+	global flag
+	console.clear()
+	print(Name, 'has discovered the easter egg, and has run away with it! ')
+	flag = False
+	
+commands = dict()
+commands['xyzzy'] = xyzzy
+commands['quit'] = quit
+commands['offer food'] = offerfood
+commands['play'] = playwith
+commands['offer water'] = offerwater
+commands['let rest'] = letrest
+commands['Play'] = playwith
+commands['Xyzzy'] = xyzzy
+commands['Quit'] = quit
+commands['Offer Food'] = offerfood
+commands['Let Rest'] = letrest
+commands['Offer Water'] = offerwater
+
+
 flag = True
 while flag:
+	console.set_color(.0, .57, 1.0)
+	print(Name, 'is a', bodysize, detail, Animal['species'], 'covered with', scalesize, scalecolor, 'scales, with', eyecolor, 'eyes.')
+	console.set_color(1.0, .0, .0)
+	print('You may use the following commands: Play, Let Rest, Offer Food, Offer Water, Quit. What each thing does is clear.')
+	console.set_color(.23, 1.0, .45)
 	print('What do you do?')
 	Increment()
 	Status()
-	cmd = input().lower()
-	if cmd == 'quit':
+	if Animal['age'] == 1:
+		print(Name, 'is', Animal['age'], 'day old. ')
+	else:
+		print(Name, 'is', Animal['age'], 'days old. ')
+	c = input()
+	for key in commands:
+		if key == c:
+			commands[key]()
+	if Animal['age'] == Animal['maxage']:
+		console.clear()
+		print(Name, 'the', creature, 'lived to an old age of', Animal['maxage'], 'and has died of old age. Good job for completing the game!')
 		flag = False
-	elif cmd == 'offer food':
-		food()
-	elif cmd == 'play':
-		Play()
-	elif cmd == 'offer water':
-		water()
-	elif cmd == 'let rest':
-		tiredness()
-	elif cmd == 'xyzzy':
-		print(Name, 'has discovered the easter egg, and has run away with it! ')
-		flag = False
-	elif cmd == 'plugh':
-		print(Name, 'yawns')
 
 print('Goodbye!')
